@@ -79,6 +79,19 @@ services:
             - '/dev/shm:/dev/shm'
        networks:
            - sail
+    phpmyadmin:
+        image: 'phpmyadmin:5'
+        ports:
+            - '${FORWARD_PHPMYADMIN_PORT:-8888}:80'
+        environment:
+            PMA_HOST: 'mysql'
+            PMA_USER: '${DB_USERNAME}'
+            PMA_PASSWORD: '${DB_PASSWORD}'
+            PMA_ABSOLUTE_URI: 'http://localhost:${FORWARD_PHPMYADMIN_PORT:-8888}/'
+        volumes:
+            - 'sailphpmyadmin:/sessions'
+        networks:
+            - sail
 networks:
     sail:
         driver: bridge
@@ -88,4 +101,6 @@ volumes:
     sailredis:
         driver: local
     sailmeilisearch:
+        driver: local
+    sailphpmyadmin:
         driver: local
