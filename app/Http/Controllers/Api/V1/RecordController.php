@@ -9,11 +9,14 @@ use App\Mail\UserMail;
 use App\Models\Course;
 use App\Models\Lecture;
 use App\Models\User;
+use App\Notifications\RecordAdmin;
+use App\Notifications\RecordUser;
 use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Notification;
 
 class RecordController extends Controller
 {
@@ -51,11 +54,11 @@ class RecordController extends Controller
             'lecture' => $lecture,
         ];
 
-        Mail::to($user->email)->send(new UserMail($data));
+        $user->notify(new RecordUser($data));
 
-//        $data['user'] = $user;
-//        $email = config('app.mailers.smtp.username');
-//        Mail::to($email)->send(new AdminMail($data));
+        $data['user'] = $user;
+        Notification::route('mail', config('mail.to'))
+            ->notify(new RecordAdmin($data));
 
         return response()->json(['data' => true]);
     }
